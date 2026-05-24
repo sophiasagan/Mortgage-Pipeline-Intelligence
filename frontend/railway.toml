@@ -1,0 +1,9 @@
+# Railway configuration — frontend service (Node / Vite)
+# Deploy this service with root directory set to ./frontend
+
+[build]
+builder      = "nixpacks"
+buildCommand = "npm ci && npm run build"
+
+[deploy]
+startCommand = "npm run start"

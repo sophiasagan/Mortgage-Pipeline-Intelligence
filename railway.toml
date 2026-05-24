@@ -1,0 +1,21 @@
+# Railway configuration — API service (Python / FastAPI)
+# Frontend is a separate Railway service rooted at ./frontend
+# Docs: https://docs.railway.com/reference/config-as-code
+
+[build]
+builder      = "nixpacks"
+buildCommand = "pip install -r requirements.txt"
+
+[deploy]
+startCommand  = "uvicorn api.main:app --host 0.0.0.0 --port $PORT"
+healthcheckPath    = "/health"
+healthcheckTimeout = 30
+restartPolicyType  = "on_failure"
+
+[[services]]
+name      = "api"
+source    = "."         # this repo root
+
+[[services]]
+name      = "frontend"
+source    = "frontend"  # Railway will detect Node/Vite here
