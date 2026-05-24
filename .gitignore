@@ -1,0 +1,44 @@
+# ─── Claude Code ──────────────────────────────────────────────────────────────
+.claude/
+CLAUDE.md
+
+# ─── Secrets ──────────────────────────────────────────────────────────────────
+.env
+*.env
+
+# ─── Python ───────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# ─── Model artefacts (large binaries — store in DVC or S3) ────────────────────
+model/pipeline_model.pkl
+model/*.pkl
+model/*.joblib
+
+# ─── MLflow ───────────────────────────────────────────────────────────────────
+mlruns/
+mlartifacts/
+
+# ─── Node / frontend ──────────────────────────────────────────────────────────
+node_modules/
+frontend/dist/
+frontend/.vite/
+.npm/
+
+# ─── OS ───────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── Editors ──────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
