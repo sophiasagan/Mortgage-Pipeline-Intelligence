@@ -96,6 +96,8 @@ function ActionItem({ action, completed, onToggleComplete, onSend }) {
       opacity: completed ? 0.55 : 1,
       transition: 'all .2s ease',
       marginBottom: 0,
+      overflow: 'hidden',   /* clip any child that escapes the card */
+      minWidth: 0,
     }}>
       {/* Row 1: badge + action text + complete toggle */}
       <div style={{ display:'flex', alignItems:'flex-start', gap:10 }}>
@@ -113,9 +115,10 @@ function ActionItem({ action, completed, onToggleComplete, onSend }) {
 
         {/* Action text */}
         <div
-          style={{ flex:1, fontSize:13, color: completed ? '#9ca3af' : '#1e293b',
+          style={{ flex:1, minWidth:0, fontSize:13, color: completed ? '#9ca3af' : '#1e293b',
                    lineHeight:1.5, cursor:'pointer', fontWeight:500,
-                   textDecoration: completed ? 'line-through' : 'none' }}
+                   textDecoration: completed ? 'line-through' : 'none',
+                   overflowWrap:'break-word', wordBreak:'break-word' }}
           onClick={() => setExpanded(e => !e)}
         >
           {action.action}
@@ -425,9 +428,10 @@ export default function ActionListCard({ actions = [], onComplete, apiBaseUrl = 
         </div>
       ) : (
         <div style={{
-          flex:1, overflowY:'auto', display:'flex', flexDirection:'column', gap:8,
+          flex:1, overflowY:'auto', overflowX:'hidden',
+          display:'flex', flexDirection:'column', gap:8,
           paddingRight:4,
-          /* Custom scrollbar */
+          minWidth:0,
           scrollbarWidth:'thin',
           scrollbarColor:'#e2e8f0 transparent',
         }}>
