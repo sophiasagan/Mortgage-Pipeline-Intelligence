@@ -32,8 +32,7 @@ frontend/node_modules/
 frontend/dist/
 frontend/.vite/
 .npm/
-package-lock.json
-frontend/package-lock.json
+# package-lock.json intentionally tracked — needed for `npm ci` on Vercel/CI
 
 # ─── OS ───────────────────────────────────────────────────────────────────────
 .DS_Store
