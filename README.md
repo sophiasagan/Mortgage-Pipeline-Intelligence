@@ -17,39 +17,7 @@
 
 ## 📸 Dashboard Preview
 
-> **Screenshot coming soon** — run the app locally and capture `http://localhost:5173`
-
-```
-┌──────────────────────────────────────────────────────────────────────────────┐
-│  🏦  Mortgage Pipeline Intelligence          ↻ Refresh   May 24, 2026       │
-├──────────────┬────────────────┬──────────────────┬──────────────────────────┤
-│  💰 $48.2M   │  📊 71% avg   │  ⚠️ 12 at-risk   │  🎯 8 projected closings │
-│  Total Pipeline│  close prob  │  < 65% threshold │  CTC + CA ≤ 30 days      │
-├──────────────┴────────────────┴──────────────────┴──────────────────────────┤
-│  🔀 Stage Funnel                                                              │
-│  [Application]›82%›[Processing]›79%›[Underwriting]›82%›[CA]›89%›[CTC]       │
-│     34 · $9M       28 · $11M        22 · $10M    🔴18 · $8M   8 · $3M        │
-│     ✅ 4d/5d        🔴 19d/14d       ✅ 18d/21d   ✅ 8d/10d    ✅ 2d/3d       │
-├────────────────────────────────────────────┬─────────────────────────────────┤
-│  🗺 Pipeline Heatmap (5 stage columns)     │  📋 Daily Actions               │
-│  ┌──────┐ ┌──────┐ ┌──────┐ ┌──────┐ ...  │  🔴 URGENT  Call underwriter…   │
-│  │LN-301│ │LN-201│ │LN-101│ │LN-401│      │       Closer · Today            │
-│  │ J.D. │ │ H.N. │ │ M.V. │ │ Q.H. │      │  ────────────────────────────── │
-│  │ 31%  │ │ 37%  │ │ 43%  │ │ 58%  │      │  🟡 HIGH   Escalate stalled…    │
-│  └──────┘ └──────┘ └──────┘ └──────┘      │       Management · Today        │
-│  hover → tooltip   click → sidebar ──────►  │  🔵 NORMAL  Chase title co…   │
-│    ┌────────────────────────────────────┐  │       Processor · Tomorrow      │
-│    │ LN-3001  ████████████░░░░░░  31%  │  │  ────────────────────────────── │
-│    │ Rate lock: 4d  Conditions: 9       │  │  ✓ Mark complete  ↗ Send email  │
-│    │ ▼ Rate lock expires in 4 days      │  │                                 │
-│    │ ▼ Appraisal disputed               │  │                                 │
-│    │ ▼ 9 outstanding conditions         │  │                                 │
-│    │ [✉️ Send to Closer]  [Close]        │  │                                 │
-│    └────────────────────────────────────┘  │                                 │
-└────────────────────────────────────────────┴─────────────────────────────────┘
-```
-
-*Replace this block with `docs/demo.png` once captured.*
+![Mortgage Pipeline Intelligence Dashboard](docs/mortgage_pipeline_intel.png)
 
 ---
 
