@@ -49,15 +49,26 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
+def _cors_origins() -> list[str]:
+    """Build the allowed-origins list from env vars at startup."""
+    origins = [
+        "http://localhost:5173",   # Vite dev
+        "http://localhost:4173",   # Vite preview
+    ]
+    # Explicit production URL, e.g. https://cu-mortgage.vercel.app
+    if url := os.getenv("FRONTEND_URL", "").strip():
+        origins.append(url)
+    return [o for o in origins if o]   # drop empty strings
+
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",   # Vite dev server
-        "http://localhost:4173",   # Vite preview
-        os.getenv("FRONTEND_URL", ""),
-    ],
-    allow_methods=["*"],
+    allow_origins=_cors_origins(),
+    # Allow every *.vercel.app preview deploy and any Railway/custom domain
+    allow_origin_regex=r"https://.*\.(vercel\.app|railway\.app)$",
+    allow_methods=["GET", "POST", "PATCH", "OPTIONS"],
     allow_headers=["*"],
+    allow_credentials=False,
 )
 
 # ---------------------------------------------------------------------------
