@@ -89,6 +89,154 @@ const fmtM    = (v) => `$${(v / 1_000_000).toFixed(1)}M`;
 const fmtPct  = (v) => `${Math.round(v * 100)}%`;
 const fmtK    = (v) => v >= 1_000_000 ? `$${(v/1_000_000).toFixed(1)}M` : `$${(v/1_000).toFixed(0)}K`;
 
+// ─── Pipeline list view ───────────────────────────────────────────────────────
+
+const STAGE_LABELS = {
+  application:    'Application',
+  processing:     'Processing',
+  underwriting:   'Underwriting',
+  cond_approval:  'Cond. Approval',
+  clear_to_close: 'Clear to Close',
+};
+
+const probColors = (p) => {
+  if (p >= 0.80) return { text:'#15803d', bg:'#dcfce7', border:'#16a34a' };
+  if (p >= 0.60) return { text:'#713f12', bg:'#fef9c3', border:'#eab308' };
+  if (p >= 0.40) return { text:'#9a3412', bg:'#ffedd5', border:'#f97316' };
+  return           { text:'#991b1b', bg:'#fee2e2', border:'#ef4444' };
+};
+
+function PipelineListView({ loans }) {
+  const [sortKey, setSortKey]   = useState('close_probability');
+  const [sortDir, setSortDir]   = useState('asc');   // asc = worst first
+
+  const sorted = useMemo(() => {
+    return [...loans].sort((a, b) => {
+      const av = a[sortKey] ?? 0;
+      const bv = b[sortKey] ?? 0;
+      return sortDir === 'asc' ? av - bv : bv - av;
+    });
+  }, [loans, sortKey, sortDir]);
+
+  const toggleSort = (key) => {
+    if (sortKey === key) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
+    else { setSortKey(key); setSortDir('asc'); }
+  };
+
+  const arrow = (key) => sortKey !== key ? '' : sortDir === 'asc' ? ' ▲' : ' ▼';
+
+  const TH = ({ k, label, right }) => (
+    <th
+      onClick={() => toggleSort(k)}
+      style={{
+        padding:'9px 12px', textAlign: right ? 'right' : 'left',
+        fontSize:11, fontWeight:700, color:'#64748b', textTransform:'uppercase',
+        letterSpacing:'.5px', cursor:'pointer', userSelect:'none',
+        whiteSpace:'nowrap', borderBottom:'2px solid #e2e8f0',
+        background: sortKey === k ? '#f8fafc' : '#fff',
+      }}
+    >
+      {label}{arrow(k)}
+    </th>
+  );
+
+  return (
+    <div style={{ overflowX:'auto' }}>
+      <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
+        <thead>
+          <tr>
+            <TH k="loan_id"           label="Loan"           />
+            <TH k="pipeline_stage"    label="Stage"          />
+            <TH k="close_probability" label="Close %"   right />
+            <TH k="days_to_projected_close" label="Days left" right />
+            <TH k="rate_lock_expiry_days"   label="Lock"     right />
+            <TH k="condition_count"         label="Conds"    right />
+            <TH k="dti"               label="DTI"       right />
+            <TH k="ltv"               label="LTV"       right />
+          </tr>
+        </thead>
+        <tbody>
+          {sorted.map((loan, i) => {
+            const c          = probColors(loan.close_probability);
+            const lockAlert  = loan.rate_lock_expiry_days <= 7;
+            const isAtRisk   = loan.close_probability < 0.65;
+            return (
+              <tr
+                key={loan.loan_id}
+                style={{
+                  background: i % 2 === 0 ? '#fff' : '#fafafa',
+                  borderLeft: `3px solid ${isAtRisk ? c.border : 'transparent'}`,
+                  transition: 'background .1s',
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = '#f1f5f9'}
+                onMouseLeave={e => e.currentTarget.style.background = i % 2 === 0 ? '#fff' : '#fafafa'}
+              >
+                <td style={{ padding:'9px 12px', borderBottom:'1px solid #f1f5f9' }}>
+                  <div style={{ fontWeight:700, color:'#1e293b', fontFamily:'monospace', fontSize:12 }}>
+                    {loan.loan_id}
+                  </div>
+                  <div style={{ fontSize:11, color:'#9ca3af', marginTop:1 }}>
+                    {loan.borrower_initials} · {loan.loan_type}
+                  </div>
+                </td>
+                <td style={{ padding:'9px 12px', borderBottom:'1px solid #f1f5f9' }}>
+                  <span style={{
+                    fontSize:11, padding:'2px 8px', borderRadius:10,
+                    background: STAGE_META[loan.pipeline_stage]?.color + '22',
+                    color: STAGE_META[loan.pipeline_stage]?.color,
+                    fontWeight:600,
+                  }}>
+                    {STAGE_META[loan.pipeline_stage]?.icon} {STAGE_LABELS[loan.pipeline_stage]}
+                  </span>
+                </td>
+                <td style={{ padding:'9px 12px', borderBottom:'1px solid #f1f5f9', textAlign:'right' }}>
+                  <span style={{
+                    fontWeight:800, fontSize:13, padding:'2px 8px',
+                    borderRadius:8, background: c.bg, color: c.text,
+                  }}>
+                    {Math.round(loan.close_probability * 100)}%
+                  </span>
+                </td>
+                <td style={{ padding:'9px 12px', borderBottom:'1px solid #f1f5f9', textAlign:'right',
+                             color: loan.days_to_projected_close <= 7 ? '#ef4444' : '#374151',
+                             fontWeight: loan.days_to_projected_close <= 7 ? 700 : 400 }}>
+                  {loan.days_to_projected_close}d
+                </td>
+                <td style={{ padding:'9px 12px', borderBottom:'1px solid #f1f5f9', textAlign:'right' }}>
+                  <span style={{
+                    color: lockAlert ? '#ef4444' : '#374151',
+                    fontWeight: lockAlert ? 700 : 400,
+                    display:'flex', alignItems:'center', justifyContent:'flex-end', gap:4,
+                  }}>
+                    {lockAlert && '🔴'}{loan.rate_lock_expiry_days}d
+                  </span>
+                </td>
+                <td style={{ padding:'9px 12px', borderBottom:'1px solid #f1f5f9', textAlign:'right',
+                             color: loan.condition_count >= 5 ? '#ef4444'
+                                  : loan.condition_count >= 3 ? '#f97316' : '#374151',
+                             fontWeight: loan.condition_count >= 3 ? 700 : 400 }}>
+                  {loan.condition_count}
+                </td>
+                <td style={{ padding:'9px 12px', borderBottom:'1px solid #f1f5f9', textAlign:'right',
+                             color: loan.dti >= 45 ? '#ef4444' : '#6b7280' }}>
+                  {loan.dti?.toFixed(0)}%
+                </td>
+                <td style={{ padding:'9px 12px', borderBottom:'1px solid #f1f5f9', textAlign:'right',
+                             color: loan.ltv >= 90 ? '#ef4444' : '#6b7280' }}>
+                  {loan.ltv?.toFixed(0)}%
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      <div style={{ padding:'10px 12px', fontSize:11, color:'#9ca3af', borderTop:'1px solid #f1f5f9' }}>
+        {sorted.length} loans · click any column header to sort · red left border = at-risk
+      </div>
+    </div>
+  );
+}
+
 // ─── KPI card ─────────────────────────────────────────────────────────────────
 
 function KpiCard({ label, value, sub, icon, color = '#1e293b', trend, alert }) {
@@ -454,7 +602,7 @@ export default function PipelineDashboard({ apiBaseUrl = '/api' }) {
           }}>
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:18 }}>
               <h3 style={{ margin:0, fontSize:15, fontWeight:700, color:'#1e293b' }}>
-                🗺 Pipeline Heatmap
+                {view === 'heatmap' ? '🗺 Pipeline Heatmap' : '☰ Pipeline List'}
               </h3>
               {/* View toggle */}
               <div style={{ display:'flex', background:'#f8fafc', borderRadius:8, padding:3, border:'1px solid #e2e8f0' }}>
@@ -485,8 +633,10 @@ export default function PipelineDashboard({ apiBaseUrl = '/api' }) {
                 <div style={{ fontSize:32, marginBottom:12 }}>⟳</div>
                 <div style={{ fontSize:14 }}>Loading pipeline data…</div>
               </div>
-            ) : (
+            ) : view === 'heatmap' ? (
               <PipelineHeatmap loans={loans} />
+            ) : (
+              <PipelineListView loans={loans} />
             )}
           </div>
 
