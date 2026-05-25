@@ -490,12 +490,11 @@ export default function PipelineDashboard({ apiBaseUrl = '/api' }) {
             )}
           </div>
 
-          {/* Actions panel */}
+          {/* Actions panel — height is content-driven; sticky tracks scroll */}
           <div style={{
             background:'#fff', borderRadius:12, padding:'20px 20px',
             boxShadow:'0 1px 4px rgba(0,0,0,.07)', border:'1px solid #f1f5f9',
-            maxHeight:'calc(100vh - 340px)', display:'flex', flexDirection:'column',
-            position:'sticky', top:24,
+            position:'sticky', top:24, alignSelf:'start',
           }}>
             {loading ? (
               <div style={{ textAlign:'center', padding:'40px 0', color:'#9ca3af', flex:1,

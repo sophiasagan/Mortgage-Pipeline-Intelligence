@@ -381,7 +381,7 @@ export default function ActionListCard({ actions = [], onComplete, apiBaseUrl = 
   const allDone = visible.length > 0 && visible.every(a => completed.has(a.loan_id));
 
   return (
-    <div style={{ display:'flex', flexDirection:'column', height:'100%' }}>
+    <div style={{ display:'flex', flexDirection:'column' }}>
       {/* Card header */}
       <div style={{
         display:'flex', justifyContent:'space-between', alignItems:'center',
@@ -428,12 +428,8 @@ export default function ActionListCard({ actions = [], onComplete, apiBaseUrl = 
         </div>
       ) : (
         <div style={{
-          flex:1, overflowY:'auto', overflowX:'hidden',
           display:'flex', flexDirection:'column', gap:8,
-          paddingRight:4,
           minWidth:0,
-          scrollbarWidth:'thin',
-          scrollbarColor:'#e2e8f0 transparent',
         }}>
           {visible.map(action => (
             <ActionItem
