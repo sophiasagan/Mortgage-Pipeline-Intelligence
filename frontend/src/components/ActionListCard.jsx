@@ -138,30 +138,34 @@ function ActionItem({ action, completed, onToggleComplete, onSend }) {
         </button>
       </div>
 
-      {/* Row 2: owner | deadline | stage | probability */}
-      <div style={{ display:'flex', gap:10, marginTop:10, flexWrap:'wrap', alignItems:'center' }}>
-        <span style={{ fontSize:12, color:'#6b7280', display:'flex', alignItems:'center', gap:4 }}>
-          {owner.icon} {owner.label}
-        </span>
+      {/* Row 2: owner | deadline | stage ── probability */}
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginTop:10, gap:8 }}>
+        {/* Left cluster — wraps if needed but never pushes probability off */}
+        <div style={{ display:'flex', gap:8, alignItems:'center', flexWrap:'wrap', minWidth:0 }}>
+          <span style={{ fontSize:12, color:'#6b7280', display:'flex', alignItems:'center', gap:4, flexShrink:0 }}>
+            {owner.icon} {owner.label}
+          </span>
 
+          <span style={{
+            fontSize:11, fontWeight:600, padding:'2px 8px', borderRadius:10,
+            background: dl.bg, color: dl.color, flexShrink:0,
+          }}>
+            ⏰ {dl.label}
+          </span>
+
+          <span style={{ fontSize:11, color:'#9ca3af', flexShrink:0 }}>
+            📍 {STAGE_LABELS[action.pipeline_stage] ?? action.pipeline_stage}
+          </span>
+        </div>
+
+        {/* Probability — always anchored to the right, never wraps */}
         <span style={{
-          fontSize:11, fontWeight:600, padding:'2px 8px', borderRadius:10,
-          background: dl.bg, color: dl.color,
-        }}>
-          ⏰ {dl.label}
-        </span>
-
-        <span style={{ fontSize:11, color:'#9ca3af' }}>
-          📍 {STAGE_LABELS[action.pipeline_stage] ?? action.pipeline_stage}
-        </span>
-
-        <span style={{
-          fontSize:11, fontWeight:700, marginLeft:'auto',
+          fontSize:11, fontWeight:700, flexShrink:0, whiteSpace:'nowrap',
           color: action.close_probability < 0.40 ? '#ef4444'
                : action.close_probability < 0.55 ? '#f97316'
                : '#6b7280',
         }}>
-          {fmtPct(action.close_probability)} close prob
+          {fmtPct(action.close_probability)} close
         </span>
       </div>
 
@@ -184,33 +188,38 @@ function ActionItem({ action, completed, onToggleComplete, onSend }) {
         </div>
       )}
 
-      {/* Row 3: Send button (shown when not completed) */}
+      {/* Row 3: action buttons (shown when not completed) */}
       {!completed && (
-        <div style={{ marginTop:12, display:'flex', gap:8 }}>
+        <div style={{ marginTop:12, display:'flex', gap:8, overflow:'hidden' }}>
           <button
             onClick={() => setExpanded(e => !e)}
             style={{
               padding:'6px 12px', background:'transparent', color:'#6b7280',
               border:'1px solid #e2e8f0', borderRadius:7, fontSize:12, cursor:'pointer',
+              flexShrink:0, whiteSpace:'nowrap',
             }}
           >
-            {expanded ? '▲ Less' : '▼ Risk details'}
+            {expanded ? '▲ Less' : '▼ Details'}
           </button>
 
           <button
             onClick={handleSend}
             onBlur={() => setSendConfirm(false)}
             style={{
-              padding:'6px 14px',
+              flex:1, minWidth:0,
+              padding:'6px 10px',
               background: sendConfirm ? pri.color : '#f8fafc',
               color:       sendConfirm ? '#fff'    : '#374151',
               border:     `1px solid ${sendConfirm ? pri.color : '#e2e8f0'}`,
               borderRadius:7, fontSize:12, cursor:'pointer',
               transition:'all .15s ease', fontWeight: sendConfirm ? 700 : 400,
-              display:'flex', alignItems:'center', gap:5,
+              display:'flex', alignItems:'center', justifyContent:'center',
+              gap:4, overflow:'hidden', whiteSpace:'nowrap',
             }}
           >
-            {sendConfirm ? `✉️ Confirm send to ${owner.label}` : `↗ Send to ${owner.label}`}
+            <span style={{ overflow:'hidden', textOverflow:'ellipsis', minWidth:0 }}>
+              {sendConfirm ? `✉️ Confirm → ${owner.label}` : `↗ Send to ${owner.label}`}
+            </span>
           </button>
         </div>
       )}
@@ -259,23 +268,27 @@ function FilterBar({ active, onChange, counts }) {
 
   return (
     <div style={{ display:'flex', gap:4, marginBottom:14, background:'#f8fafc',
-                  borderRadius:8, padding:3 }}>
+                  borderRadius:8, padding:3, overflow:'hidden' }}>
       {tabs.map(({ key, label, count }) => (
         <button
           key={key}
           onClick={() => onChange(key)}
           style={{
-            flex:1, padding:'7px 4px', border:'none', borderRadius:6,
+            flex:1, minWidth:0, padding:'7px 2px', border:'none', borderRadius:6,
             fontSize:12, fontWeight: active === key ? 700 : 500,
             cursor:'pointer', transition:'all .15s ease',
             background: active === key ? '#fff' : 'transparent',
             color:       active === key ? '#1e293b' : '#6b7280',
             boxShadow:   active === key ? '0 1px 4px rgba(0,0,0,.1)' : 'none',
+            overflow:'hidden', whiteSpace:'nowrap',
+            display:'flex', alignItems:'center', justifyContent:'center', gap:3,
           }}
         >
-          {label}
+          <span style={{ overflow:'hidden', textOverflow:'ellipsis', minWidth:0 }}>
+            {label}
+          </span>
           <span style={{
-            marginLeft:5, fontSize:10, fontWeight:700, padding:'1px 5px',
+            fontSize:10, fontWeight:700, padding:'1px 5px', flexShrink:0,
             borderRadius:10, background: active === key ? '#f1f5f9' : 'transparent',
           }}>
             {count}
